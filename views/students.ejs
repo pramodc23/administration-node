@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Page</title>    
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to the Students Page</h1>
+        
+        <div class="button-container">
+            <a href="#" class="btn" id="studentBtn">Student</a>
+        </div>
+
+        <div id="responseDataList">
+            <h2 id="lable"></h2>
+            <ul id="list"></ul>
+        </div>
+    </div>
+
+    <script>
+        
+        document.getElementById("studentBtn").addEventListener("click", async function(event) {
+            event.preventDefault(); // Prevent default link behavior
+
+            const token = localStorage.getItem("authToken"); // Retrieve stored token
+            const baseURL = '<%= baseURL %>';
+            const myconstent = '<%= myconstent %>';
+            if (!token) {
+                alert("User not authenticated! Please log in.");
+                window.location.href = "/login"; // Redirect if no token
+                return;
+            }
+            try {
+                const response = await fetch(`${baseURL}/api/students`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` // Pass token in Authorization header
+                    }
+                }); 
+                const result = await response.json();
+                if (response.ok) {
+                    const teacherList = document.getElementById("list");
+                    teacherList.innerHTML = "";
+                    
+                    result.data.forEach(teacher => {
+                        const li = document.createElement("li");
+                        li.textContent = teacher.name;
+                        teacherList.appendChild(li);
+                    });
+                                        
+                    document.getElementById("lable").innerText = "Student"; 
+                    document.getElementById("responseDataList").style.display = "block"; // Show teacher list
+                } else {
+                    alert("Failed to fetch teachers: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Something went wrong. Check the console for details.");
+            }
+        });
+
+    </script>
+
+</body>
+</html>

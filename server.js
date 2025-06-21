@@ -30,9 +30,18 @@ app.use('/api/courses', coursesRoute);
 app.get("/home", (req, res) => {
     res.render("home", { baseURL: process.env.BASEURL, myconstent:config.myconstent }); // Render the home.ejs template
 });
+
+app.get("/teachers",  (req, res) => {
+    res.render("teachers", { baseURL: process.env.BASEURL, myconstent:config.myconstent }); 
+});
+app.get("/students",  (req, res) => {
+    res.render("students", { baseURL: process.env.BASEURL, myconstent:config.myconstent }); 
+});
+
+
+
 app.get('/', (req,res)=>{
     res.render('login');
-    //res.end("Welcome to administration project");
 });
 
 app.use(errorHandler);

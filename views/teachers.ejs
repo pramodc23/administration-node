@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teachers Page</title>    
+    <link rel="stylesheet" href="/css/teacher.css">
+
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to the Teachers Page</h1>
+        
+        <div class="button-container">
+            <button class="btn" id="getTeachers">Get Teachers</button>
+            <div class="button-container">
+                <button class="btn" id="creatTeacher">Create Teacher</button >
+            </div>
+        </div>
+
+        <div class="form-container">
+            <h2>Create Teacher</h2>
+            <form id="submitTeacher">
+                <div class="input-group">
+                    <label for="name">Name</label>
+                    <input type="text"  id="name" placeholder="Enter your name" required>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email"  placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" placeholder="Enter your phone" required>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div id="responseDataList">
+            <h2 id="lable"></h2>
+            <ul id="list"></ul>
+        </div>
+    </div>
+
+    <script>
+
+        const baseURL = '<%= baseURL %>';
+        const myconstent = '<%= myconstent %>';
+
+        async function fetchAndDisplayTeachers() {
+            const token = localStorage.getItem("authToken"); // Retrieve stored token
+
+            if (!token) {
+                alert("User not authenticated! Please log in.");
+                window.location.href = "/login"; // Redirect if no token
+                return;
+            }
+
+            try {
+                const response = await fetch(`${baseURL}/api/teachers`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` // Pass token in Authorization header
+                    }
+                }); 
+                const result = await response.json();
+                if (response.ok) {
+                    const teacherList = document.getElementById("list");
+                    teacherList.innerHTML = "";
+                    
+                    result.data.forEach(teacher => {
+                        const li = document.createElement("li");
+                        li.textContent = teacher.name;
+                        teacherList.appendChild(li);
+                    });
+                                        
+                    document.getElementById("lable").innerText = "Teacher"; 
+                    document.getElementById("responseDataList").style.display = "block"; // Show teacher list
+                } else {
+                    alert("Failed to fetch teachers: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Something went wrong. Check the console for details.");
+            }
+        }
+
+
+        document.getElementById("submitTeacher").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent page refresh 
+
+            const token = localStorage.getItem("authToken"); 
+            const baseURL = '<%= baseURL %>';
+            const myconstent = '<%= myconstent %>';
+            if (!token) {
+                alert("User not authenticated! Please log in.");
+                window.location.href = "/login"; // Redirect if no token
+                return;
+            }
+
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const phone = document.getElementById("phone").value;
+            const role = 'teacher';
+            const department_id = 1;
+
+            const response = await fetch(`${baseURL}/api/teachers`, {
+                method: "POST",
+                headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` 
+                    },
+                body: JSON.stringify({name, email, phone, department_id })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                fetchAndDisplayTeachers(); 
+            } else {
+                alert("Login failed: " + result.message); // Show error message
+            }
+        });
+
+        document.getElementById("getTeachers").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default link behavior
+            fetchAndDisplayTeachers(); // Call the function to fetch and display teachers
+        });
+        
+    </script>
+
+</body>
+</html>
