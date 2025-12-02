@@ -3,6 +3,8 @@ const cors = require("cors"); // Import CORS middleware
 const errorHandler = require('./middlewares/errorHandler');
 const config = require('./config/config');
 
+require('./test');
+
 const authRoutes = require('./routes/authRoutes');  
 const studentRoutes = require('./routes/studentRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
